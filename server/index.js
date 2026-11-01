@@ -213,4 +213,4 @@ const adminReplyWaiting = new Map();
   console.log('BOT_TOKEN не задан. Сервер запустится без Telegram-бота.');
 }
 
-app.listen(port, () => console.log(`MEMEGIFT server listening on ${port}`));
+app.listen(port, '0.0.0.0', () => console.log(`MEMEGIFT server listening on ${port}`));
