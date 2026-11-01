@@ -9,6 +9,7 @@ import { verifyTelegramInitData } from './telegramAuth.js';
 const app = express();
 app.use(express.json());
 const port = Number(process.env.PORT || 3000);
+const webhookUrl = process.env.WEBHOOK_URL || '';
 const token = process.env.BOT_TOKEN;
 const webAppUrl = process.env.WEB_APP_URL;
 
@@ -53,6 +54,9 @@ app.post('/api/me', (req, res) => {
 
 if (token && token !== 'PASTE_NEW_BOT_TOKEN_HERE') {
   const bot = new Telegraf(token);
+if (webhookUrl) {
+  app.use('/telegram-webhook', bot.webhookCallback('/telegram-webhook'));
+}
   bot.start(async ctx => {
     const user = createUser(
       ctx.from.id,
@@ -206,7 +210,15 @@ const adminReplyWaiting = new Map();
     await ctx.reply(messages[ctx.match[1]]);
   });
 
-  bot.launch().then(() => console.log('MEMEGIFT bot started')).catch(err => console.error('Bot launch error:', err.message));
+  if (webhookUrl) {
+  bot.telegram.setWebhook(webhookUrl)
+    .then(() => console.log('MEMEGIFT webhook enabled'))
+    .catch(err => console.error('Webhook error:', err.message));
+} else {
+  bot.launch()
+    .then(() => console.log('MEMEGIFT bot started'))
+    .catch(err => console.error('Bot launch error:', err.message));
+}
   process.once('SIGINT', () => bot.stop('SIGINT'));
   process.once('SIGTERM', () => bot.stop('SIGTERM'));
 } else {
