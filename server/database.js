@@ -1,4 +1,13 @@
+import pg from 'pg';
 
+const { Pool } = pg;
+
+export const pool = process.env.DATABASE_URL
+  ? new Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: { rejectUnauthorized: true }
+    })
+  : null;
 import { DatabaseSync } from 'node:sqlite';
 import { mkdirSync } from 'node:fs';
 
@@ -33,3 +42,11 @@ export function createUser(telegramId, username, firstName) {
 }
 
 export { db };
+export async function testPostgresConnection() {
+  if (!pool) {
+    throw new Error('DATABASE_URL не настроен');
+  }
+
+  const result = await pool.query('SELECT NOW() AS server_time');
+  return result.rows[0];
+}

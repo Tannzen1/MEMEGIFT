@@ -2,7 +2,18 @@ import 'dotenv/config';
 import express from 'express';
 import { Telegraf, Markup } from 'telegraf';
 
-import { createUser, getUser } from './database.js';
+import {
+  createUser,
+  getUser,
+  testPostgresConnection
+} from './database.js';
+
+testPostgresConnection()
+  .then(() => console.log('✅ Supabase подключён!'))
+  .catch(error => console.error(
+    '❌ Ошибка подключения Supabase:',
+    error.message
+  ));
 import { verifyTelegramInitData } from './telegramAuth.js';
 
 
