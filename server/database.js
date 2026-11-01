@@ -1,11 +1,18 @@
 import pg from 'pg';
+import { readFileSync } from 'node:fs';
 
 const { Pool } = pg;
 
 export const pool = process.env.DATABASE_URL
   ? new Pool({
       connectionString: process.env.DATABASE_URL,
-      ssl: { rejectUnauthorized: true }
+      ssl: {
+  ca: readFileSync(
+    new URL('./prod-ca-2021.crt', import.meta.url),
+    'utf8'
+  ),
+  rejectUnauthorized: true
+}
     })
   : null;
 import { DatabaseSync } from 'node:sqlite';
